@@ -28,7 +28,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ResponseT
 	});
 	if (result) {
 		//send email
-		const resetURL = `Hello ${result.name}. <br/>Follow this link to reset password.<a href="http://localhost:3000/verify-mail?token=${result.emailVerificationToken}">Click Here</a>`;
+		const resetURL = `Hello ${result.name}. <br/>Follow this link to reset password.<a href="${process.env.API_URL}verify-mail?token=${result.emailVerificationToken}">Click Here</a>`;
 		const info = await sendMail({
 			to: result.email,
 			subject: 'Verify your email',
