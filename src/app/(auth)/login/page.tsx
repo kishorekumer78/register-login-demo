@@ -2,6 +2,7 @@
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import React from 'react';
+import { toast } from 'react-hot-toast';
 
 export default function LoginPage(): React.ReactElement {
 	const router = useRouter();
@@ -17,18 +18,6 @@ export default function LoginPage(): React.ReactElement {
 			password: formData.get('password')
 		};
 
-		// const res = await fetch('/api/login', {
-		// 	method: 'POST',
-		// 	headers: {
-		// 		'Content-Type': 'application/json'
-		// 	},
-		// 	body: JSON.stringify(payload)
-		// });
-		// if (!res.ok) {
-		// 	// toast unsuccessful login
-		// }
-		// const data = await res.json();
-		// redirect to dashboard
 		const res = await signIn('credentials', {
 			redirect: false,
 			email: payload.email,
@@ -36,7 +25,11 @@ export default function LoginPage(): React.ReactElement {
 			callbackUrl: '/dashboard'
 		});
 		if (!res?.error) {
+			toast.success('Login Success');
 			router.replace('/dashboard');
+		} else {
+			toast.error('Failed to login');
+			router.replace('/');
 		}
 	};
 
@@ -45,7 +38,8 @@ export default function LoginPage(): React.ReactElement {
 			<div className="">
 				<form
 					className="w-96 mx-auto mt-40 p-10 border border-gray-200 rounded-lg shadow-lg"
-					onSubmit={handleLogin}>
+					onSubmit={handleLogin}
+				>
 					<div>
 						<label htmlFor="email" className="label label-text">
 							Email

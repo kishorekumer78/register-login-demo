@@ -1,10 +1,12 @@
 import prisma from '@/lib/db/prisma';
+
 import bcryptjs from 'bcryptjs';
-import { AuthOptions } from 'next-auth';
+import { NextAuthOptions } from 'next-auth';
 import NextAuth from 'next-auth/next';
 import CredentialsProvider from 'next-auth/providers/credentials';
+import { NextRequest, NextResponse } from 'next/server';
 
-const authOptions: AuthOptions = {
+const authOptions: NextAuthOptions = {
 	// Configure one or more authentication providers
 	pages: {
 		signIn: '/login'
@@ -15,22 +17,40 @@ const authOptions: AuthOptions = {
 	secret: process.env.JWT_SECRET,
 	providers: [
 		CredentialsProvider({
-			name: 'Credentials',
+			name: 'Sign in',
+			credentials: {
+				email: {
+					// label: 'Email',
+					type: 'email'
+					// placeholder: 'example@example.com'
+				},
+				password: {
+					// label: 'Password',
+					type: 'password'
+				}
+			},
 			async authorize(credentials, req) {
-				let email = credentials?.email;
-				let password = credentials?.password;
-
-				const user = await prisma.user.findUnique({
-					where: { email: email }
-				});
-				if (user) {
-					const isValid = await bcryptjs.compare(password!, user.password);
-					if (isValid) {
-						return user;
-					}
-				} else {
+				if (!credentials?.email || !credentials.password) {
 					return null;
 				}
+				const { email, password } = credentials;
+				const user = await prisma.user.findUnique({
+					where: {
+						email: email
+					}
+				});
+
+				if (!user || !(await bcryptjs.compare(password, user.password))) {
+					return null;
+				}
+
+				return {
+					id: user.id,
+					email: user.email,
+					name: user.name,
+					activated: user.activated
+					// randomKey: 'Hey cool'
+				};
 			}
 		})
 	]
