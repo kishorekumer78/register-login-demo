@@ -1,0 +1,12 @@
+1.  Prisma DB init , user table
+
+2.  On registration create user and generate token and save in the DB and send the same token in the email for verification
+
+3.  If user activates the token set activated =  true in DB
+
+4.  redirect to login page 
+
+5. On login if credentials ok set token 
+
+6. once redirected to dash board the middleware checks the token and do as per req 
+
